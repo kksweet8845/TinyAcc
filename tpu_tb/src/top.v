@@ -1,5 +1,4 @@
 `include "define.v"
-`include "sram.v"
 
 module TOP(
     input clk,
@@ -18,9 +17,9 @@ reg wr_en_b;
 reg wr_en_out;
 
 
-wire [9:0] addr_a;
-wire [9:0] addr_b;
-wire [9:0] addr_out;
+wire [`WORD_ADDR_BITS-1:0] addr_a;
+wire [`WORD_ADDR_BITS-1:0] addr_b;
+wire [`WORD_ADDR_BITS-1:0] addr_out;
 
 wire [`WORD_SIZE-1:0] DI_a;
 wire [`WORD_SIZE-1:0] DI_b;
@@ -33,8 +32,11 @@ wire [`WORD_SIZE-1:0] DO_out;
 
 
 wire valid;
-wire tpu_out_valid;
-wire tpu_done;
+// wire tpu_out_valid;
+// wire tpu_done;
+
+reg tpu_out_valid;
+reg tpu_done;
 
 
 reg last;
@@ -42,6 +44,10 @@ reg tpu_in_valid;
 reg [7:0] K;
 reg [7:0] index_i;
 reg [4:0] cur_st;
+
+// reg [7:0] m_val;
+// reg [7:0] k_val;
+// reg [7:0] n_val;
 
 reg done;
 
@@ -63,7 +69,7 @@ always@(posedge clk or negedge rst) begin
                 wr_en_out <= 1'b0;
                 done <= 1'b0;
                 tpu_in_valid <= 1'b0;
-                if(start) cur_st <= 1'b1;
+                if(start) cur_st <= 5'd1;
             end
             5'd1: begin
                 done <= 1'b0;
@@ -72,11 +78,14 @@ always@(posedge clk or negedge rst) begin
                 last <= (K == k-1) ? 1'b1 : 1'b0;
                 wr_en_a <= 1'b0;
                 wr_en_b <= 1'b0;
-                wr_en_out <= (K == k-2) ? 1'b1 : 1'b0;
+                wr_en_out <= 1'b1;
                 cur_st <= (K == k-1) ? 5'd2 : 5'd1;
             end
             5'd2: begin //* finish, start to output data
                 done <= (tpu_done) ? 1'b1 : 1'b0;
+                wr_en_a <= 1'b0;
+                wr_en_b <= 1'b0;
+                wr_en_out <= 1'b1;
             end
         endcase
     end
@@ -98,17 +107,17 @@ assign addr_out = {2'b00, index_i};
 
     //* You TPU design, name would be different
     //* ========================================
-    TPU tpu_i(
-        .clk        (clk            ),
-        .rst        (rst            ),
-        .in_valid   (tpu_in_valid   ),
-        .mat_DI     (DO_a           ),
-        .wei_DI     (DO_b           ),
-        .in_last    (last           ),
-        .out_valid  (tpu_out_valid  ),
-        .DO         (DI_out         ),
-        .done       (tpu_done       )
-    );
+    // TPU tpu_i(
+    //     .clk        (clk            ),
+    //     .rst        (rst            ),
+    //     .in_valid   (tpu_in_valid   ),
+    //     .mat_DI     (DO_a           ),
+    //     .wei_DI     (DO_b           ),
+    //     .in_last    (last           ),
+    //     .out_valid  (tpu_out_valid  ),
+    //     .DO         (DI_out         ),
+    //     .done       (tpu_done       )
+    // );
     //* =========================================
 
     SRAM GBUFF_A(
