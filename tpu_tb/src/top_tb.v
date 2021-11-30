@@ -59,8 +59,8 @@ module top_tb;
 
 
 
-        #(`CYCLE * 30) top_i.tpu_out_valid = 1'b1; top_i.tpu_done = 1'b0;
-        #(`CYCLE * 30) top_i.tpu_out_valid = 1'b0; top_i.tpu_done = 1'b1;
+        // #(`CYCLE * 30) top_i.tpu_out_valid = 1'b1; top_i.tpu_done = 1'b0;
+        // #(`CYCLE * 30) top_i.tpu_out_valid = 1'b0; top_i.tpu_done = 1'b1;
 
 
 
