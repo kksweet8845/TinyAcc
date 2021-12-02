@@ -16,5 +16,5 @@ typedef struct conv {
 } conv;
 
              
-void conv_forward(conv *op);
+void conv_forward(conv *conv);
 //void conv_backward(conv *op);
