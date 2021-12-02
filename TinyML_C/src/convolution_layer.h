@@ -1,6 +1,6 @@
 #include <stdlib.h>
 
-typedef struct conv_op {
+typedef struct conv {
     float *input;   float *d_input;
     float *output;  float *d_output;
     float *weights; float *d_weights;
@@ -13,8 +13,8 @@ typedef struct conv_op {
     int in_units, out_units;
 
     short batchsize;
-} conv_op;
+} conv;
 
              
-void conv_op_forward(conv_op *op);
-//void conv_op_backward(conv_op *op);
+void conv_forward(conv *op);
+//void conv_backward(conv *op);
