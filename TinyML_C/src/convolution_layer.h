@@ -18,3 +18,6 @@ typedef struct conv {
              
 void conv_forward(conv *conv);
 //void conv_backward(conv *op);
+
+inline void calloc_conv_weights(conv *conv);
+inline void free_conv_weights(conv *conv);
