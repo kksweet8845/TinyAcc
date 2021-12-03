@@ -56,3 +56,10 @@ typedef struct network {
     fc fc2;
 
 } tiny_ml;
+
+void init_tinyML_arch(tiny_ml *net, short batchsize);
+
+void malloc_tinyML(tiny_ml *net);
+void free_tinyML(tiny_ml *net);
+
+void load_weight(tiny_ml *net, char *weights_path);
