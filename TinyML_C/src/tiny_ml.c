@@ -184,7 +184,7 @@ int main(int argc, char* argv[])
         load_weights(&net, weights_path);
         printf("TinyML preprocess setup fininshed. Start inference & Input the image into Systolic Arrary\n");
         inference_model(&net, argv[2]);
-        free_alexnet(&net);
+        free_tinyML(&net);
         
     }
     else {
