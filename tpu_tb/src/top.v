@@ -32,14 +32,11 @@ wire [`WORD_SIZE-1:0] DO_out;
 
 
 wire valid;
-// wire tpu_out_valid;
-// wire tpu_done;
-
+wire tpu_out_valid_wire;
 reg tpu_out_valid;
-reg tpu_done;
+wire tpu_done;
 
 
-reg last;
 reg tpu_in_valid;
 reg [7:0] K;
 reg [7:0] index_i;
@@ -75,11 +72,10 @@ always@(posedge clk or negedge rst) begin
                 done <= 1'b0;
                 tpu_in_valid <= (K == k-1) ? 1'b0 : 1'b1;
                 K <= (K == k-1) ? 0 : K + 8'd1;
-                last <= (K == k-1) ? 1'b1 : 1'b0;
                 wr_en_a <= 1'b0;
                 wr_en_b <= 1'b0;
                 wr_en_out <= 1'b1;
-                cur_st <= (K == k-1) ? 5'd2 : 5'd1;
+                cur_st <= (K == k-1) ? 5'd2 : 5'd1;   
             end
             5'd2: begin //* finish, start to output data
                 done <= (tpu_done) ? 1'b1 : 1'b0;
@@ -101,24 +97,27 @@ always@(negedge clk or negedge rst) begin
     end
 end
 
-assign addr_a = {2'b00, K};
-assign addr_b = {2'b00, K};
+always@(tpu_out_valid_wire) begin
+    tpu_out_valid <= tpu_out_valid_wire;
+end
+
+
+assign addr_a = {2'b00, K+8'd1};
+assign addr_b = {2'b00, K+8'd1};
 assign addr_out = {2'b00, index_i};
 
-    //* You TPU design, name would be different
-    //* ========================================
-    // TPU tpu_i(
-    //     .clk        (clk            ),
-    //     .rst        (rst            ),
-    //     .in_valid   (tpu_in_valid   ),
-    //     .mat_DI     (DO_a           ),
-    //     .wei_DI     (DO_b           ),
-    //     .in_last    (last           ),
-    //     .out_valid  (tpu_out_valid  ),
-    //     .DO         (DI_out         ),
-    //     .done       (tpu_done       )
-    // );
-    //* =========================================
+
+    TPU tpu_i(
+        .clk        (clk               ),
+        .rst        (rst               ),
+        .in_valid   (tpu_in_valid      ),
+        .mat_DI     (DO_a              ),
+        .wei_DI     (DO_b              ),
+        .out_valid  (tpu_out_valid_wire),
+        .DO         (DI_out            ),
+        .done       (tpu_done          )
+    );
+
 
     SRAM GBUFF_A(
         .clk    (clk        ),
