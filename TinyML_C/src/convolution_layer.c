@@ -83,7 +83,7 @@ static void* conv_do_forward(void *argv)
     // t_output   [oc,oh,ow]
     //
     // *********************
-    
+
     img2col(t_input, x_col, cp.conv);
     matrix_multiply(x_col, cp.conv->weights, t_output, owoh, ikk, cp.conv->out_channels); //output[owoh,oc]
     matrix_transpose(t_output, owoh, cp.conv->out_channels); //output[oc,owoh]
@@ -124,3 +124,14 @@ void conv_forward(conv *conv)
 
 }
 
+void calloc_conv_weights(conv *conv)
+{
+    conv->weights = (float *)calloc(conv->out_channels * conv->in_channels * conv->kernel_size * conv->kernel_size, sizeof(float));
+    conv->bias    = (float *)calloc(conv->out_channels, sizeof(float));
+}
+
+void free_conv_weights(conv *conv)
+{
+    free(conv->weights);
+    free(conv->bias);
+}
