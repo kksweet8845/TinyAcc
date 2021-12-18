@@ -9,19 +9,19 @@ module TOP(
 );
 
 
-input       clk;
-input       rst;
-input [9:0] row;
-input       start;
-output      done;
+input           clk;
+input           rst;
+input [9:0]     nset;
+input           start;
+output reg      done;
 
 
 
 reg wen_A;
 reg wen_B;
 
-reg [`WORD_ADDR_BITS-1:0]   addr_A;
-reg [`WORD_ADDR_BITS-1:0]   addr_B;
+wire [`WORD_ADDR_BITS-1:0]   addr_A;
+wire [`WORD_ADDR_BITS-1:0]   addr_B;
 
 reg [`WORD_SIZE-1:0]        DI_A;
 reg [`WORD_SIZE-1:0]        DI_B;
@@ -31,8 +31,9 @@ wire [`WORD_SIZE-1:0]        DO_A;
 wire [`WORD_SIZE-1:0]        DO_B;
 
 reg max_DI_valid;
+wire [`WORD_SIZE-1:0]        max_DI;
+
 wire max_DO_valid;
-reg [`WORD_SIZE-1:0]        max_DI;
 wire [`WORD_SIZE-1:0]       max_DO;
 
 
@@ -51,7 +52,6 @@ always@(posedge clk or negedge rst) begin
     if(!rst) begin
         cur_st <= 4'd0;
         wen_A <= 1'b0;
-        addr_A <= 0;
         max_DI_valid <= 1'b0;
         nset_cnt <= 10'd0;
         row_i <= 4'd0;
@@ -60,7 +60,6 @@ always@(posedge clk or negedge rst) begin
         case(cur_st)
             4'd0: begin //* Initial state
                 max_DI_valid <= 1'b0;
-                addr_A <= 10'd0;
                 wen_A <= 1'b0; //* Read-only
                 nset_cnt <= 10'h3ff;
                 row_i <= 4'd0;
@@ -74,10 +73,8 @@ always@(posedge clk or negedge rst) begin
                 cur_st <= (nset_cnt == nset-1) ? 4'd3 : 4'd2;
             end
             4'd2: begin //* Start to get data
-                addr_A <= (nset_cnt << 4) + row_i;
                 row_i <= (row_i == 4'd15) ? 0 : row_i + 4'd1;
-                max_DI <= DO_A;
-                max_DI_valid <= (row_i > 0) ? 1'b1 : 1'b0;
+                max_DI_valid <= 1'b1;
                 cur_st <= (row_i == 4'd15) ? 4'd1 : 4'd2;
             end
             4'd3: begin //* No available data, should wait MAX to output data
@@ -91,20 +88,22 @@ end
 always@(posedge clk or negedge rst) begin
     if(!rst) begin
         wen_B <= 1'b0;
-        out_cnt <= 10'd0;
-        addr_B <= 10'd0;
+        out_cnt <= 10'h3ff;
     end else begin
         if(max_DO_valid) begin
             wen_B <= 1'b1;
             DI_B <= max_DO;
             out_cnt <= (out_cnt == output_dim-1) ? 10'd0 : out_cnt + 10'd1;
-            addr_B <= out_cnt;
         end else begin
             wen_B <= 1'b0;
         end
     end
 end
 
+assign max_DI = DO_A;
+
+assign addr_B = out_cnt;
+assign addr_A = (nset_cnt << 4) + row_i;
 
 
     //* Your MAXP design

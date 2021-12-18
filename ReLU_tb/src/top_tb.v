@@ -7,7 +7,7 @@ module top_tb;
     reg clk;
     reg rst;
     reg start;
-    reg nset;
+    reg [9:0] nset;
     wire done;
     reg [7:0] row_a, col_b, k;
     integer err, i, row_offset, j;
@@ -18,43 +18,46 @@ module top_tb;
     TOP top_i(
         .clk(clk),
         .rst(rst),
-        .nset(nset),
+        .n(nset),
         .start(start),
         .done(done)
     );
 
     initial begin
-        clk = 0; rst = 0; start = 0;
+        clk = 0; rst = 0; start = 0; nset = 0;
         #(`CYCLE * 5) rst = 1; start = 1;
         nset = `NSET;
 
         $readmemb("build/input.bin", top_i.GBUFF_A.gbuff);
         $readmemb("build/golden.bin", GOLDEN);
 
-        // $display("Matrix a");
-        // for(i=0;i<9;i=i+1) begin
-        //     $display("GBUFF_A[%2d] = %2h_%2h_%2h_%2h_%2h_%2h_%2h_%2h_%2h_%2h_%2h_%2h_%2h_%2h_%2h_%2h\n",
-        //     i,
-        //     top_i.GBUFF_A.gbuff[i][127:120],
-        //     top_i.GBUFF_A.gbuff[i][119:112],
-        //     top_i.GBUFF_A.gbuff[i][111:104],
-        //     top_i.GBUFF_A.gbuff[i][103:96],
-        //     top_i.GBUFF_A.gbuff[i][95:88],
-        //     top_i.GBUFF_A.gbuff[i][87:80],
-        //     top_i.GBUFF_A.gbuff[i][79:72],
-        //     top_i.GBUFF_A.gbuff[i][71:64],
-        //     top_i.GBUFF_A.gbuff[i][63:56],
-        //     top_i.GBUFF_A.gbuff[i][55:48],
-        //     top_i.GBUFF_A.gbuff[i][47:40],
-        //     top_i.GBUFF_A.gbuff[i][39:32],
-        //     top_i.GBUFF_A.gbuff[i][31:24],
-        //     top_i.GBUFF_A.gbuff[i][23:16],
-        //     top_i.GBUFF_A.gbuff[i][15:8],
-        //     top_i.GBUFF_A.gbuff[i][7:0]);
-        // end
+        $display("Matrix a");
+        for(i=0;i<9;i=i+1) begin
+            $display("GBUFF_A[%2d] = %2h_%2h_%2h_%2h_%2h_%2h_%2h_%2h_%2h_%2h_%2h_%2h_%2h_%2h_%2h_%2h\n",
+            i,
+            top_i.GBUFF_A.gbuff[i][127:120],
+            top_i.GBUFF_A.gbuff[i][119:112],
+            top_i.GBUFF_A.gbuff[i][111:104],
+            top_i.GBUFF_A.gbuff[i][103:96],
+            top_i.GBUFF_A.gbuff[i][95:88],
+            top_i.GBUFF_A.gbuff[i][87:80],
+            top_i.GBUFF_A.gbuff[i][79:72],
+            top_i.GBUFF_A.gbuff[i][71:64],
+            top_i.GBUFF_A.gbuff[i][63:56],
+            top_i.GBUFF_A.gbuff[i][55:48],
+            top_i.GBUFF_A.gbuff[i][47:40],
+            top_i.GBUFF_A.gbuff[i][39:32],
+            top_i.GBUFF_A.gbuff[i][31:24],
+            top_i.GBUFF_A.gbuff[i][23:16],
+            top_i.GBUFF_A.gbuff[i][15:8],
+            top_i.GBUFF_A.gbuff[i][7:0]);
+        end
 
         // #(`CYCLE * 30) top_i.tpu_out_valid = 1'b1; top_i.tpu_done = 1'b0;
         // #(`CYCLE * 30) top_i.tpu_out_valid = 1'b0; top_i.tpu_done = 1'b1;
+        // wait(top_i.cur_st == 1);
+        // #(`CYCLE * `NSET) top_i.relu_DO_valid = 1'b1;
+
 
         wait(done == 1);
         $display("\nSimulation Done.\n");

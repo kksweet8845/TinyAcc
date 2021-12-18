@@ -8,8 +8,8 @@ module TOP(
 );
 
 
-input           clk,
-input           rst,
+input           clk;
+input           rst;
 input [9:0]     n;
 input           start;
 output reg      done;
@@ -18,22 +18,22 @@ output reg      done;
 reg wen_A;
 reg wen_B;
 
-reg [`WORD_ADDR_BITS-1:0]   addr_A;
-reg [`WORD_ADDR_BITS-1:0]   addr_B;
+wire [`WORD_ADDR_BITS-1:0]  addr_A;
+wire [`WORD_ADDR_BITS-1:0]  addr_B;
 
 reg [`WORD_SIZE-1:0]        DI_A;
 reg [`WORD_SIZE-1:0]        DI_B;
 
 
-wire [`WORD_SIZE-1:0]        DO_A;
-wire [`WORD_SIZE-1:0]        DO_B;
+wire [`WORD_SIZE-1:0]       DO_A;
+wire [`WORD_SIZE-1:0]       DO_B;
 
 
-reg                     relu_DI_valid;
-reg [`WORD_SIZE-1:0]    relu_DI;
+reg                         relu_DI_valid;
+wire [`WORD_SIZE-1:0]       relu_DI;
 
-wire                    relu_DO_valid;
-wire [`WORD_SIZE-1:0]   relu_DO;
+wire                        relu_DO_valid;
+wire [`WORD_SIZE-1:0]       relu_DO;
 
 
 reg [3:0] cur_st;
@@ -44,28 +44,28 @@ reg [`WORD_ADDR_BITS-1:0]   DO_index;
 always@(posedge clk or negedge rst) begin
     if(!rst) begin
         cur_st <= 4'd0;
-        addr_A <= 10'd0;
         DI_A <= 0;
         done <= 1'b0;
         wen_A <= 1'b0;
         DI_index <= 10'h3ff;
+        relu_DI_valid <= 1'b0;
     end else begin
         case(cur_st)
             4'd0: begin //* Initial state
                 done <= 1'b0;
                 wen_A <= 1'b0;
-                DI_index <= 10'h3ff;
+                DI_index <= 10'd0;
                 cur_st <= (start) ? 4'd1 : 4'd0;
+                relu_DI_valid <= 1'b0;
             end
             4'd1: begin //* start to output data
-                addr_A <= DI_index;
                 wen_A <= 1'b0;
                 DI_index <= (DI_index == n-1) ? 10'd0 : DI_index + 10'd1;
-                relu_DI_valid <= (DI_index > 0) ? 1'b1 : 1'b0;
-                relu_DI <= DO_A;
+                relu_DI_valid <= 1'b1;
                 cur_st <= (DI_index == n-1) ? 4'd2 : 4'd1;
             end
             4'd2: begin //* no data available
+                relu_DI_valid <= 1'b0;
                 done <= (DO_index == n-1) ? 1'b1 : 1'b0;
                 cur_st <= 4'd2;
             end
@@ -75,20 +75,24 @@ end
 
 always@(posedge clk or negedge rst) begin
     if(!rst) begin
-        web_B <= 1'b0;
-        DO_index <= 10'd0;
-        addr_B <= 10'd0;
+        wen_B <= 1'b0;
+        DO_index <= 10'h3ff;
     end else begin
         if(relu_DO_valid) begin
             wen_B <= 1'b1;
             DI_B <= relu_DO;
             DO_index <= (DO_index == n-1) ? 10'd0 : DO_index + 10'd1;
-            addr_B <= DO_index;
         end else begin
             wen_B <= 1'b0;
         end
     end 
 end
+
+
+assign addr_A = DI_index;
+assign addr_B = DO_index;
+
+assign relu_DI = DO_A;
 
 
     //* Your ReLu design

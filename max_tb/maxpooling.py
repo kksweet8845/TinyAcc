@@ -110,7 +110,7 @@ def main():
 
 
     input_mat = np.zeros((16, row, 16))
-    golden_mat = np.zeros((16, row, 16))
+    golden_mat = np.zeros((16, int(row/2), 16))
     rand_mat = (16 * np.random.rand(ch, row, col)) % 16
     rand_mat = rand_mat.astype(int)
 
