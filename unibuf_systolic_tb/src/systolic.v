@@ -178,6 +178,7 @@ always@(posedge clk or negedge rst) begin
                     cur_st <= 5'd0;
                 end else if(config_valid & conv_op) begin
                     op_reg  <= 1'b1;
+                    uni_row_reg <= 8'd3;
                     cur_st  <= 5'd1;
                     ack     <= 1'b1;
                 end else if(config_valid & mat_op) begin
@@ -242,7 +243,7 @@ always@(posedge clk or negedge rst) begin
                 uni_data_fetch <= (!uni_data_NA) && (wei_col_index == kernel_size-1) ? 1'b1 : 1'b0; 
                 uni_data_buf <= (wei_col_index == kernel_size -1) ? uni_data : uni_data_buf;
                 wei_data_fetch <= (uni_data_NA & wei_data_NA) ? 1'b0 : 1'b1;
-                wei_row_index_rst <=  ((!uni_data_NA) && (wei_row_index == wei_row_reg-2)) ? 1'b1 : 1'b0;
+                wei_row_index_rst <=  ((wei_row_index == wei_row_reg-2) || (DO_cnt == DO_total - 1)) ? 1'b1 : 1'b0;
                 DO_cnt <= (DO_cnt == DO_total -1) ? 0 : DO_cnt + 10'd1;
                 wei_col_index <= (wei_col_index == kernel_size -1) ? 8'd0 : wei_col_index + 8'd1;
                 cur_st <= (DO_cnt == DO_total -1) ? 5'd0 : 5'd6;
@@ -278,7 +279,7 @@ assign  mat_op = op == 3'b010 ? 1'b1 : 1'b0;
 
 assign uni_zero_pad_DI = (uni_data_buf_valid) ? uni_data_buf : 0;
 assign mat_total = uni_channel_reg * uni_row_reg;
-assign DO_total = (op_reg == 1'b1) ? mat_total * 3 : mat_total;
+assign DO_total = (op_reg == 1'b1) ? mat_total * 3 : uni_row_reg;
 assign DO_valid = (uni_out_valid & wei_out_valid) ? 1'b1 : 1'b0;
 assign DO_uni   =  (op_reg == 1'b1) ? uni_zero_pad_DO_reg : uni_data;
 assign DO_wei   =  wei_data;

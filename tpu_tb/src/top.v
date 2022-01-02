@@ -107,6 +107,7 @@ assign addr_b = {2'b00, K+8'd1};
 assign addr_out = {2'b00, index_i};
 
 
+    //TODO Should not aware of the matrix dimension 
     TPU tpu_i(
         .clk        (clk               ),
         .rst        (rst               ),

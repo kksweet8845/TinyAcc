@@ -4,14 +4,12 @@
 
 module top_tb;
 
-
     reg clk;
     reg rst;
     reg start;
     wire done;
     reg [7:0] row_a, col_b, k;
     integer err, i, row_offset, j;
-
 
     reg [`WORD_SIZE-1:0] GOLDEN [0:`WORD_CNT-1];
     always #(`CYCLE/2) clk = ~clk;
@@ -25,7 +23,6 @@ module top_tb;
         .n(col_b),
         .done(done)
     );
-
 
     initial begin
         clk = 0; rst = 0; start = 0;
@@ -57,18 +54,11 @@ module top_tb;
             top_i.GBUFF_A.gbuff[i][7:0]);
         end
 
-
-
         // #(`CYCLE * 30) top_i.tpu_out_valid = 1'b1; top_i.tpu_done = 1'b0;
         // #(`CYCLE * 30) top_i.tpu_out_valid = 1'b0; top_i.tpu_done = 1'b1;
 
-
-
-
-
         wait(done == 1);
         $display("\nSimulation Done.\n");
-        
         
         err = 0;
         for(i=0;i<`MATRIX_A_ROW; i=i+1) begin

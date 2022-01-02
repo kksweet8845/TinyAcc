@@ -1,4 +1,6 @@
 build
+test_case
+test_case
 
 # Prerequisites
 *.d
