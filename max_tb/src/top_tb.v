@@ -29,11 +29,11 @@ module top_tb;
         #(`CYCLE * 5) rst = 1; start = 1;
         nset = `NSET;
 
-        $readmemb("build/input.bin", top_i.GBUFF_A.gbuff);
-        $readmemb("build/golden.bin", GOLDEN);
+        $readmemb("C:/Users/user/ca_final/TinyAcc/max_tb/test/build/input.bin", top_i.GBUFF_A.gbuff);
+        $readmemb("C:/Users/user/ca_final/TinyAcc/max_tb/test/build/golden.bin", GOLDEN);
 
         $display("Matrix a");
-        for(i=0;i<9;i=i+1) begin
+        for(i=0;i<10;i=i+1) begin
             $display("GBUFF_A[%2d] = %2h_%2h_%2h_%2h_%2h_%2h_%2h_%2h_%2h_%2h_%2h_%2h_%2h_%2h_%2h_%2h\n",
             i,
             top_i.GBUFF_A.gbuff[i][127:120],

@@ -30,10 +30,10 @@ module top_tb;
     initial begin
         clk = 0; rst = 0; start = 0;
         #(`CYCLE * 5) rst = 1; start = 1; top_i.tpu_out_valid = 1'b0;
-        row_a = `MATRIX_A_ROW; col_b = `MATRIX_B_COL; k = `MATRIX_A_COL;
-        $readmemb("build/matrix_a.bin", top_i.GBUFF_A.gbuff);
-        $readmemb("build/matrix_b.bin", top_i.GBUFF_B.gbuff);
-        $readmemb("build/golden.bin", GOLDEN);
+        row_a = 16; col_b = `MATRIX_B_COL; k = `MATRIX_A_COL;
+        $readmemb("C:/Users/user/ca_final/TinyAcc/build/matrix_a.bin", top_i.GBUFF_A.gbuff);
+        $readmemb("C:/Users/user/ca_final/TinyAcc/build/matrix_b.bin", top_i.GBUFF_B.gbuff);
+        $readmemb("C:/Users/user/ca_final/TinyAcc/build/golden.bin", GOLDEN);
 
         $display("Matrix a");
         for(i=0;i<9;i=i+1) begin
@@ -57,12 +57,30 @@ module top_tb;
             top_i.GBUFF_A.gbuff[i][7:0]);
         end
 
-
+        $display("Matrix b");
+        for(i=0;i<9;i=i+1) begin
+            $display("GBUFF_B[%2d] = %2h_%2h_%2h_%2h_%2h_%2h_%2h_%2h_%2h_%2h_%2h_%2h_%2h_%2h_%2h_%2h\n",
+            i,
+            top_i.GBUFF_B.gbuff[i][127:120],
+            top_i.GBUFF_B.gbuff[i][119:112],
+            top_i.GBUFF_B.gbuff[i][111:104],
+            top_i.GBUFF_B.gbuff[i][103:96],
+            top_i.GBUFF_B.gbuff[i][95:88],
+            top_i.GBUFF_B.gbuff[i][87:80],
+            top_i.GBUFF_B.gbuff[i][79:72],
+            top_i.GBUFF_B.gbuff[i][71:64],
+            top_i.GBUFF_B.gbuff[i][63:56],
+            top_i.GBUFF_B.gbuff[i][55:48],
+            top_i.GBUFF_B.gbuff[i][47:40],
+            top_i.GBUFF_B.gbuff[i][39:32],
+            top_i.GBUFF_B.gbuff[i][31:24],
+            top_i.GBUFF_B.gbuff[i][23:16],
+            top_i.GBUFF_B.gbuff[i][15:8],
+            top_i.GBUFF_B.gbuff[i][7:0]);
+        end
 
         // #(`CYCLE * 30) top_i.tpu_out_valid = 1'b1; top_i.tpu_done = 1'b0;
         // #(`CYCLE * 30) top_i.tpu_out_valid = 1'b0; top_i.tpu_done = 1'b1;
-
-
 
 
 
