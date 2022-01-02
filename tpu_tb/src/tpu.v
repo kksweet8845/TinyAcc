@@ -39,25 +39,6 @@ integer                  output_count;
 integer                  cycle_count;
 integer                  i;
 
-<<<<<<< HEAD
-
-always@(posedge in_valid) begin
-    pl_count <= 0;
-    pl_count2 <= 0;
-    sa_in_valid <= 1'b1;
-    for(i=0; i< `MATRIX_A_COL+`MATRIX_A_ROW-1; i=i+1) begin
-        data_pl[i] <= 128'd0;
-        weight_pl[i] <= 128'd0;
-    end 
-//-------------------------------------------
-    out_valid <= 1'b0;
-    done <= 1'b0;
-    output_count <= 0;
-    cycle_count_vaild <= 1'b1;
-    cycle_count <= 0;
-end
-=======
->>>>>>> d04e660d0e12c1a217f16e2322ba3074ab6eb1d0
 
 
 //------------------------------ Input Pipeline ------------------------------//
