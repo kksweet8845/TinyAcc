@@ -2,6 +2,7 @@
 module PE(
     clk,
     rst,
+    zero,
     left_in,
     up_in,
     right_out,
@@ -11,6 +12,7 @@ module PE(
 
 input                          clk;
 input                          rst;
+input                          zero;
 input      [`BYTES_SIZE-1:0]   left_in;
 input      [`BYTES_SIZE-1:0]   up_in;
 output reg [`BYTES_SIZE-1:0]    right_out;
@@ -23,7 +25,11 @@ always@(posedge clk or negedge rst) begin
         right_out <= 8'd0;
         down_out <= 8'd0;
     end else begin
-        sum <= sum + left_in * up_in;
+        if(zero) begin
+            sum <= 8'd0;
+        end else begin
+            sum <= sum + left_in * up_in;
+        end
         right_out <= left_in;
         down_out <= up_in;
     end
@@ -34,6 +40,7 @@ endmodule
 module ROW_PE(
     clk,
     rst,
+    zero,
     left_in,
     up_in,
     down_out,
@@ -42,6 +49,7 @@ module ROW_PE(
 
 input                       clk;
 input                       rst;
+input                       zero;
 input  [`BYTES_SIZE-1:0]    left_in;
 input  [127:0]              up_in;
 output [127:0]              down_out;
@@ -52,6 +60,7 @@ wire   [`BYTES_SIZE-1:0]     right_out [0:15];
      PE pe1(
     .clk        (clk),
     .rst        (rst),
+    .zero       (zero),
     .left_in    (left_in),
     .up_in      (up_in[127:120]),
     .right_out  (right_out[0]),
@@ -62,6 +71,7 @@ wire   [`BYTES_SIZE-1:0]     right_out [0:15];
     PE pe2(
     .clk        (clk),
     .rst        (rst),
+    .zero       (zero),
     .left_in    (right_out[0]),
     .up_in      (up_in[119:112]),
     .right_out  (right_out[1]),
@@ -72,6 +82,7 @@ wire   [`BYTES_SIZE-1:0]     right_out [0:15];
     PE pe3(
     .clk        (clk),
     .rst        (rst),
+    .zero       (zero),
     .left_in    (right_out[1]),
     .up_in      (up_in[111:104]),
     .right_out  (right_out[2]),
@@ -82,6 +93,7 @@ wire   [`BYTES_SIZE-1:0]     right_out [0:15];
     PE pe4(
     .clk        (clk),
     .rst        (rst),
+    .zero       (zero),
     .left_in    (right_out[2]),
     .up_in      (up_in[103:96]),
     .right_out  (right_out[3]),
@@ -92,6 +104,7 @@ wire   [`BYTES_SIZE-1:0]     right_out [0:15];
     PE pe5(
     .clk        (clk),
     .rst        (rst),
+    .zero       (zero),
     .left_in    (right_out[3]),
     .up_in      (up_in[95:88]),
     .right_out  (right_out[4]),
@@ -102,6 +115,7 @@ wire   [`BYTES_SIZE-1:0]     right_out [0:15];
     PE pe6(
     .clk        (clk),
     .rst        (rst),
+    .zero       (zero),
     .left_in    (right_out[4]),
     .up_in      (up_in[87:80]),
     .right_out  (right_out[5]),
@@ -112,6 +126,7 @@ wire   [`BYTES_SIZE-1:0]     right_out [0:15];
     PE pe7(
     .clk        (clk),
     .rst        (rst),
+    .zero       (zero),
     .left_in    (right_out[5]),
     .up_in      (up_in[79:72]),
     .right_out  (right_out[6]),
@@ -122,6 +137,7 @@ wire   [`BYTES_SIZE-1:0]     right_out [0:15];
     PE pe8(
     .clk        (clk),
     .rst        (rst),
+    .zero       (zero),
     .left_in    (right_out[6]),
     .up_in      (up_in[71:64]),
     .right_out  (right_out[7]),
@@ -132,6 +148,7 @@ wire   [`BYTES_SIZE-1:0]     right_out [0:15];
     PE pe9(
     .clk        (clk),
     .rst        (rst),
+    .zero       (zero),
     .left_in    (right_out[7]),
     .up_in      (up_in[63:56]),
     .right_out  (right_out[8]),
@@ -142,6 +159,7 @@ wire   [`BYTES_SIZE-1:0]     right_out [0:15];
     PE pe10(
     .clk        (clk),
     .rst        (rst),
+    .zero       (zero),
     .left_in    (right_out[8]),
     .up_in      (up_in[55:48]),
     .right_out  (right_out[9]),
@@ -152,6 +170,7 @@ wire   [`BYTES_SIZE-1:0]     right_out [0:15];
     PE pe11(
     .clk        (clk),
     .rst        (rst),
+    .zero       (zero),
     .left_in    (right_out[9]),
     .up_in      (up_in[47:40]),
     .right_out  (right_out[10]),
@@ -162,6 +181,7 @@ wire   [`BYTES_SIZE-1:0]     right_out [0:15];
     PE pe12(
     .clk        (clk),
     .rst        (rst),
+    .zero       (zero),
     .left_in    (right_out[10]),
     .up_in      (up_in[39:32]),
     .right_out  (right_out[11]),
@@ -172,6 +192,7 @@ wire   [`BYTES_SIZE-1:0]     right_out [0:15];
     PE pe13(
     .clk        (clk),
     .rst        (rst),
+    .zero       (zero),
     .left_in    (right_out[11]),
     .up_in      (up_in[31:24]),
     .right_out  (right_out[12]),
@@ -182,6 +203,7 @@ wire   [`BYTES_SIZE-1:0]     right_out [0:15];
     PE pe14(
     .clk        (clk),
     .rst        (rst),
+    .zero       (zero),
     .left_in    (right_out[12]),
     .up_in      (up_in[23:16]),
     .right_out  (right_out[13]),
@@ -192,6 +214,7 @@ wire   [`BYTES_SIZE-1:0]     right_out [0:15];
     PE pe15(
     .clk        (clk),
     .rst        (rst),
+    .zero       (zero),
     .left_in    (right_out[13]),
     .up_in      (up_in[15:8]),
     .right_out  (right_out[14]),
@@ -202,6 +225,7 @@ wire   [`BYTES_SIZE-1:0]     right_out [0:15];
     PE pe16(
     .clk        (clk),
     .rst        (rst),
+    .zero       (zero),
     .left_in    (right_out[14]),
     .up_in      (up_in[7:0]),
     .right_out  (right_out[15]),

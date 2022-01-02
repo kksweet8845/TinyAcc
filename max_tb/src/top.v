@@ -33,7 +33,8 @@ wire [`WORD_SIZE-1:0]        DO_B;
 reg max_DI_valid;
 wire [`WORD_SIZE-1:0]        max_DI;
 
-wire max_DO_valid;
+reg max_DO_valid;
+wire max_DO_valid_wire;
 wire [`WORD_SIZE-1:0]       max_DO;
 
 
@@ -43,6 +44,7 @@ reg [3:0]                   nxt_st;
 
 reg [9:0]                   nset_cnt;
 reg [9:0]                   out_cnt;
+reg [9:0]                   out_cnt2;
 reg [3:0]                   row_i;
 
 wire [9:0]                  output_dim;
@@ -89,32 +91,38 @@ always@(posedge clk or negedge rst) begin
     if(!rst) begin
         wen_B <= 1'b0;
         out_cnt <= 10'h3ff;
+        out_cnt2 <= 10'd0;
     end else begin
         if(max_DO_valid) begin
             wen_B <= 1'b1;
             DI_B <= max_DO;
-            out_cnt <= (out_cnt == output_dim-1) ? 10'd0 : out_cnt + 10'd1;
+            out_cnt <= (out_cnt == output_dim-1) ? 0 : out_cnt + 10'd1;
+            out_cnt2 <= (out_cnt == output_dim-1) ? out_cnt2 + 10'd1 : out_cnt2;
         end else begin
             wen_B <= 1'b0;
         end
     end
 end
 
+always@(max_DO_valid_wire) begin
+    max_DO_valid <= max_DO_valid_wire;
+end
+
 assign max_DI = DO_A;
 
-assign addr_B = out_cnt;
+assign addr_B = out_cnt + out_cnt2 * 10'd16;
 assign addr_A = (nset_cnt << 4) + row_i;
 
 
-    //* Your MAXP design
-    // MAXP max_i(
-    //     .clk        (clk            ),
-    //     .rst        (rst            ),
-    //     .DI_valid   (max_DI_valid   ),  
-    //     .DI         (max_DI         ),
-    //     .DO_valid   (max_DO_valid   ),
-    //     .DO         (max_DO         )
-    // );
+
+     MAXP max_i(
+         .clk        (clk              ),
+         .rst        (rst              ),
+         .DI_valid   (max_DI_valid     ),  
+         .DI         (max_DI           ),
+         .DO_valid   (max_DO_valid_wire),
+         .DO         (max_DO           )
+     );
 
 
     SRAM GBUFF_A(
