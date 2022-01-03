@@ -3,7 +3,8 @@
 module TOP(
     clk,
     rst,
-    nset,    
+    nset,
+    channel,
     start,
     done
 );
@@ -12,6 +13,7 @@ module TOP(
 input           clk;
 input           rst;
 input [9:0]     nset;
+input [`DATA_MAX_BITS-1:0] channel;
 input           start;
 output reg      done;
 
@@ -33,9 +35,13 @@ wire [`WORD_SIZE-1:0]        DO_B;
 reg max_DI_valid;
 wire [`WORD_SIZE-1:0]        max_DI;
 
-reg max_DO_valid;
-wire max_DO_valid_wire;
+// reg max_DO_valid;
+wire                        max_DO_valid;
+// wire max_DO_valid_wire;
 wire [`WORD_SIZE-1:0]       max_DO;
+
+wire                        dr_DO_valid;
+wire [`WORD_SIZE-1:0]       dr_DO;
 
 
 
@@ -93,20 +99,21 @@ always@(posedge clk or negedge rst) begin
         out_cnt <= 10'h3ff;
         out_cnt2 <= 10'd0;
     end else begin
-        if(max_DO_valid) begin
+        if(dr_DO_valid) begin
             wen_B <= 1'b1;
-            DI_B <= max_DO;
+            DI_B <= dr_DO;
             out_cnt <= (out_cnt == output_dim-1) ? 0 : out_cnt + 10'd1;
             out_cnt2 <= (out_cnt == output_dim-1) ? out_cnt2 + 10'd1 : out_cnt2;
         end else begin
             wen_B <= 1'b0;
         end
+
     end
 end
 
-always@(max_DO_valid_wire) begin
-    max_DO_valid <= max_DO_valid_wire;
-end
+// always@(max_DO_valid_wire) begin
+//     max_DO_valid <= max_DO_valid_wire;
+// end
 
 assign max_DI = DO_A;
 
@@ -120,8 +127,18 @@ assign addr_A = (nset_cnt << 4) + row_i;
          .rst        (rst              ),
          .DI_valid   (max_DI_valid     ),  
          .DI         (max_DI           ),
-         .DO_valid   (max_DO_valid_wire),
+         .DO_valid   (max_DO_valid     ),
          .DO         (max_DO           )
+     );
+
+     Data_Rotator dr_i(
+         .clk           (clk                ),
+         .rst           (rst                ),
+         .channel       (channel            ),
+         .DI_valid      (max_DO_valid       ),
+         .DI            (max_DO             ),
+         .DO_valid      (dr_DO_valid        ),
+         .DO            (dr_DO              )
      );
 
 

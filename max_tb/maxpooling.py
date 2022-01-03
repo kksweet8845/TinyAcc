@@ -110,7 +110,8 @@ def main():
 
 
     input_mat = np.zeros((16, row, 16))
-    golden_mat = np.zeros((16, int(row/2), 16))
+    golden_mat = np.zeros((16, int(row/2), 16)).astype(int)
+    org_golden_mat = np.zeros((ch, int(row/2), 16)).astype(int)
     rand_mat = (16 * np.random.rand(ch, row, col)) % 16
     rand_mat = rand_mat.astype(int)
 
@@ -118,7 +119,7 @@ def main():
 
     input_mat[:ch, 0:row, 0:col] = rand_mat
     golden_mat[:ch, 0:int(row/2), 0:int(col/2)] = max_mat
-
+    org_golden_mat[:ch, 0:int(row/2), 0:int(col/2)] = max_mat
 
     # print(input_mat)
     input_mat = np.transpose(input_mat, (1, 2, 0)).astype(int)
@@ -143,16 +144,22 @@ def main():
     input_filename = "input.bin"
     input_txt      = "input.txt"
     golden_filename = "golden.bin"
+    org_golden_filename = "org_golden.bin"
     golden_txt      = "golden.txt"
+    org_golden_txt = "org_golden.txt"
+
     input_filepath = os.path.join(build_path, input_filename)
     golden_filepath = os.path.join(build_path, golden_filename)
+    org_golden_filepath = os.path.join(build_path, org_golden_filename)
+    
 
 
     write_binary(input_filepath, input_mat)
     write_binary(golden_filepath, golden_mat)
+    write_binary(org_golden_filepath, org_golden_mat)
     write_txt(os.path.join(build_path, input_txt), input_mat)
     write_txt(os.path.join(build_path, golden_txt), golden_mat)
-
+    write_txt(os.path.join(build_path, org_golden_txt), org_golden_mat)
     
     nset = row
     mdef = "matrix_define.v"
