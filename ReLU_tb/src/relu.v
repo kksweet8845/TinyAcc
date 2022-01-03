@@ -1,4 +1,4 @@
-`define "define.v"
+`include "define.v"
 module ReLU(
     clk,
     rst,
@@ -13,26 +13,26 @@ input                       clk;
 input                       rst;
 input                       DI_valid;
 input      [`WORD_SIZE-1:0] DI;
-output reg                  DO_valid;
+output                      DO_valid;
 output reg [`WORD_SIZE-1:0] DO;
 
+reg        [`DATA_SIZE-1:0] relu[0:15];
+integer i;
 
-//* Your Design Here
-always @(posedge clk)
-begin
-    if($signed(x) >= 0)
-    begin
-        if(|x[2*dataWidth-1-:weightIntWidth+1]) //over flow to sign bit of integer part
-            out <= {1'b0,{(dataWidth-1){1'b1}}}; //positive saturate
-        else
-            out <= x[2*dataWidth-1-weightIntWidth-:dataWidth];
-    end
-    else 
-        out <= 0;      
+assign DO_valid = DI_valid;
+
+always@(*) begin
+    if(!rst) begin
+        DO = 0;
+        for(i=0;i<16;i=i+1) begin
+            relu[i] = 0;
+        end
+    end else begin
+        for(i=0;i<16;i=i+1) begin
+            relu[i] = (DI[(i<<3) +: 8] >= 8'h80) ? 0 : DI[(i<<3) +: 8];
+        end
+        DO = {relu[15], relu[14], relu[13], relu[12], relu[11], relu[10], relu[9], relu[8], relu[7], relu[6], relu[5], relu[4], relu[3], relu[2], relu[1], relu[0]};
+    end   
 end
-
-
-
-
 
 endmodule

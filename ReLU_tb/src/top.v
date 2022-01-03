@@ -95,15 +95,14 @@ assign addr_B = DO_index;
 assign relu_DI = DO_A;
 
 
-    //* Your ReLu design
-    // ReLU relu_i(
-    //     .clk        (clk            ),
-    //     .rst        (rst            ),
-    //     .DI_valid   (relu_DI_valid  ),
-    //     .DI         (relu_DI        ),
-    //     .DO_valid   (relu_DO_valid  ),
-    //     .DO         (relu_DO        )
-    // );
+    ReLU relu_i(
+            .clk        (clk            ),
+            .rst        (rst            ),
+            .DI_valid   (relu_DI_valid  ),
+            .DI         (relu_DI        ),
+            .DO_valid   (relu_DO_valid  ),
+            .DO         (relu_DO        )
+    );
 
     SRAM GBUFF_A(
         .clk    (clk        ),
