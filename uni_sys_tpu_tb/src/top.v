@@ -141,6 +141,51 @@ wire                                syslic_DO_valid;
 wire    [`WORD_SIZE-1:0]            syslic_DO_uni;
 wire    [`WORD_SIZE-1:0]            syslic_DO_wei;
 
+//* TPU array
+wire                                tpu_in_valid;
+wire    [`WORD_SIZE-1:0]            tpu_mat_DI;
+wire    [`WORD_SIZE-1:0]            tpu_wei_DI;
+wire                                tpu_out_valid;
+wire    [`WORD_SIZE-1:0]            tpu_DO;
+wire                                tpu_done;
+
+//* Max pooling
+wire                                maxp_DI_valid;
+wire    [`WORD_SIZE-1:0]            maxp_DI;
+wire                                maxp_DO_valid;
+wire    [`WORD_SIZE-1:0]            maxp_DO;
+
+
+//* ReLU
+wire                                relu_DI_valid;
+wire    [`WORD_SIZE-1:0]            relu_DI;
+wire                                relu_DO_valid;
+wire    [`WORD_SIZE-1:0]            relu_DO;
+
+//* Data Rotator
+wire                                dr_config_valid;
+wire    [2:0]                       dr_op;
+wire    [`DATA_MAX_BITS-1:0]        dr_channel;
+wire                                dr_DI_valid;
+wire    [`WORD_SIZE-1:0]            dr_DI;
+wire                                dr_DO_valid;
+wire    [`WORD_SIZE-1:0]            dr_DO;
+
+//* WB Ctrl
+wire                                wb_ctrl_config_valid;
+wire    [2:0]                       wb_ctrl_op;
+wire    [`WORD_ADDR_BITS-1:0]       wb_ctrl_src_addr;
+wire    [`DATA_MAX_BITS-1:0]        wb_ctrl_channel;
+wire    [`DATA_MAX_BITS-1:0]        wb_ctrl_row;
+wire    [`DATA_MAX_BITS-1:0]        wb_ctrl_col;
+wire                                wb_ctrl_ack;
+wire                                wb_ctrl_done;
+wire                                wb_ctrl_DI_valid;
+wire    [`WORD_SIZE-1:0]            wb_ctrl_DI;
+wire                                wb_ctrl_DO_valid;
+wire    [`WORD_SIZE-1:0]            wb_ctrl_DO;
+wire    [`WORD_ADDR_BITS-1:0]       wb_ctrl_DO_addr;
+
 //* A buf
 wire                                A_buf_rd_valid;
 wire    [`WORD_ADDR_BITS-1:0]       A_buf_rd_addr;
@@ -274,6 +319,7 @@ wire    [`WORD_SIZE-1:0]            OUT_wei_DO;
         .sys_wei_data       (unibuf_sys_wei_data        )
     );
 
+    //* Sytolic array
     Systolic syslic_i(
         .clk                (clk                        ),
         .rst                (rst                        ),
@@ -302,6 +348,72 @@ wire    [`WORD_SIZE-1:0]            OUT_wei_DO;
         .DO_wei             (syslic_DO_wei              )
     );
 
+
+    //* tpu
+    TPU tpu_i(
+        .clk                (clk                        ),
+        .rst                (rst                        ),
+        .in_valid           (tpu_in_valid               ),
+        .mat_DI             (tpu_mat_DI                 ),
+        .wei_DI             (tpu_wei_DI                 ),
+        .out_valid          (tpu_out_valid              ),
+        .DO                 (DI_out                     ),
+        .done               (tpu_done                   )
+    );
+
+
+    //* ReLU
+    ReLU relu_i(
+        .clk                (clk                        ),
+        .rst                (rst                        ),
+        .DI_valid           (relu_DI_valid              ),
+        .DI                 (relu_DI                    ),
+        .DO_valid           (relu_DO_valid              ),
+        .DO                 (relu_DO)
+    );
+
+    //* max pooling
+    MAXP maxp_i(
+        .clk                (clk                        ),
+        .rst                (rst                        ),
+        .DI_valid           (maxp_DI_valid              ),
+        .DI                 (maxp_DI                    ),
+        .DO_valid           (maxp_DO_valid              ),
+        .DO                 (maxp_DO                    )
+    );
+
+    //* Data rotator
+    Data_Rotator dr_i(
+        .clk                (clk                        ),
+        .rst                (rst                        ),
+        .config             (dr_config_valid            ),
+        .op                 (dr_op                      ),
+        .channel            (dr_channel                 ),
+        .DI_valid           (dr_DI_valid                ),
+        .DI                 (dr_DI                      ),
+        .DO_valid           (dr_DO_valid                ),
+        .DO                 (dr_DO                      )
+    );
+
+    //* WB
+    WBCtrl wb_ctrl_i(
+        .clk                (clk                        ),
+        .rst                (rst                        ),
+        .config_valid       (wb_ctrl_config_valid       ),
+        .op                 (wb_ctrl_op                 ),
+        .src_addr           (wb_ctrl_src_addr           ),
+        .channel            (wb_ctrl_channel            ),
+        .row                (wb_ctrl_row                ),
+        .col                (wb_ctrl_col                ),
+        .ack                (wb_ctrl_ack                ),
+        .done               (wb_ctrl_done               ),
+        .DI_valid           (wb_ctrl_DI_valid           ),
+        .DI                 (wb_ctrl_DI                 ),
+        .DO_valid           (wb_ctrl_DO_valid           ),
+        .DO                 (wb_ctrl_DO                 ),
+        .DO_addr            (wb_ctrl_DO_addr            )
+    );
+    
 
     SRAM_2 GBUFF_A(
         .clk                (clk                        ),
